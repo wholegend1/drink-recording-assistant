@@ -2,11 +2,12 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>月底破產兇手名單</title>
     
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFF8E1' stroke='%23FFB74D' stroke-width='2'/%3E%3C!-- Face --%3E%3Ccircle cx='50' cy='45' r='28' fill='%23FFCCBC'/%3E%3C!-- Blush --%3E%3Ccircle cx='35' cy='50' r='4' fill='%23FFAB91' opacity='0.6'/%3E%3Ccircle cx='65' cy='50' r='4' fill='%23FFAB91' opacity='0.6'/%3E%3C!-- Eyes --%3E%3Ccircle cx='40' cy='42' r='2.5' fill='%235D4037'/%3E%3Ccircle cx='60' cy='42' r='2.5' fill='%235D4037'/%3E%3C!-- Mouth --%3E%3Cpath d='M46 50 q4 3 8 0' stroke='%235D4037' stroke-width='1.5' fill='none'/%3E%3C!-- Body --%3E%3Cpath d='M25 80 Q50 95 75 80 L75 100 L25 100 Z' fill='%23FFCC80'/%3E%3C!-- Hands holding drink --%3E%3Ccircle cx='35' cy='75' r='6' fill='%23FFCCBC'/%3E%3Ccircle cx='65' cy='75' r='6' fill='%23FFCCBC'/%3E%3C!-- Drink Cup --%3E%3Cpath d='M40 65 h20 l-2 25 h-16 Z' fill='%238D6E63'/%3E%3Cline x1='50' y1='65' x2='55' y2='55' stroke='%233E2723' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='45' cy='85' r='1.5' fill='%23000'/%3E%3Ccircle cx='52' cy='80' r='1.5' fill='%23000'/%3E%3C/svg%3E" type="image/svg+xml">
-    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFF8E1' stroke='%23FFB74D' stroke-width='2'/%3E%3Ccircle cx='50' cy='45' r='28' fill='%23FFCCBC'/%3E%3Ccircle cx='35' cy='50' r='4' fill='%23FFAB91' opacity='0.6'/%3E%3Ccircle cx='65' cy='50' r='4' fill='%23FFAB91' opacity='0.6'/%3E%3Ccircle cx='40' cy='42' r='2.5' fill='%235D4037'/%3E%3Ccircle cx='60' cy='42' r='2.5' fill='%235D4037'/%3E%3Cpath d='M46 50 q4 3 8 0' stroke='%235D4037' stroke-width='1.5' fill='none'/%3E%3Cpath d='M25 80 Q50 95 75 80 L75 100 L25 100 Z' fill='%23FFCC80'/%3E%3Ccircle cx='35' cy='75' r='6' fill='%23FFCCBC'/%3E%3Ccircle cx='65' cy='75' r='6' fill='%23FFCCBC'/%3E%3Cpath d='M40 65 h20 l-2 25 h-16 Z' fill='%238D6E63'/%3E%3Cline x1='50' y1='65' x2='55' y2='55' stroke='%233E2723' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='45' cy='85' r='1.5' fill='%23000'/%3E%3Ccircle cx='52' cy='80' r='1.5' fill='%23000'/%3E%3C/svg%3E" type="image/svg+xml">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FFF8E1'/%3E%3Ccircle cx='50' cy='45' r='28' fill='%23FFCCBC'/%3E%3Ccircle cx='40' cy='42' r='2.5' fill='%235D4037'/%3E%3Ccircle cx='60' cy='42' r='2.5' fill='%235D4037'/%3E%3Cpath d='M40 65 h20 l-2 25 h-16 Z' fill='%238D6E63'/%3E%3C/svg%3E">
 
     <style>
@@ -23,16 +24,18 @@
             --input-bg: #F9FAFB;
             --shadow: 0 4px 20px rgba(0,0,0,0.05);
             --radius: 20px;
+            --safe-bottom: env(safe-area-inset-bottom);
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0; padding: 0;
-            padding-bottom: 120px;
+            padding-bottom: calc(100px + var(--safe-bottom)); /* 增加底部緩衝 */
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .icon { width: 20px; height: 20px; fill: currentColor; }
@@ -42,6 +45,7 @@
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             position: sticky; top: 0; z-index: 100;
+            padding-top: max(15px, env(safe-area-inset-top)); /* 瀏海適配 */
         }
         h1 { margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text); letter-spacing: 1px; }
         .icon-btn { border: none; background: none; font-size: 1.5rem; cursor: pointer; padding: 5px; color: var(--text); display:flex; align-items:center; }
@@ -53,33 +57,59 @@
             position: relative;
         }
 
+        /* --- iOS 表單元件強制修正 --- */
         .form-group { margin-bottom: 15px; position: relative; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; color: #888; }
 
+        /* 通用 Input 重置 */
         input:not([type="checkbox"]), select {
             width: 100%; height: 50px; padding: 0 15px; border: 2px solid #E5E7EB;
-            border-radius: 16px; font-size: 1rem; box-sizing: border-box;
+            border-radius: 16px; font-size: 16px; /* 16px 防止 iOS 縮放 */
+            box-sizing: border-box;
             background-color: var(--input-bg); color: var(--text);
-            -webkit-appearance: none; appearance: none; transition: 0.2s;
+            -webkit-appearance: none; /* 關鍵：移除 iOS 預設樣式 */
+            appearance: none; 
+            transition: 0.2s;
+            line-height: normal; /* 修正垂直對齊 */
         }
+        
         select {
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat; background-position: right 15px center; background-size: 18px; padding-right: 40px;
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); background: #FFF; }
 
+        /* Fix 1: 日期選擇器徹底重寫 (iOS 相容) */
         input[type="date"] {
-            display: block; width: 100%; max-width: 250px; margin: 0 auto;
-            background: #FFF; border: 2px solid #E5E7EB;
-            font-weight: 700; color: var(--primary-dark);
-            text-align: center; cursor: pointer;
-            padding: 0 10px;
+            display: block; 
+            width: 100%; 
+            max-width: 100%; /* 防止跑版 */
+            margin: 0;
+            background: #FFF; 
+            border: 2px solid #E5E7EB;
+            font-weight: 700; 
+            color: var(--primary-dark);
+            text-align: center; 
+            cursor: pointer;
+            padding: 0;
+            /* Flexbox 置中文字 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-appearance: none;
+            min-height: 50px;
         }
+        /* 隱藏原生 icon，改用整條可點 */
         input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            opacity: 0; cursor: pointer;
+        }
+        input[type="date"]::-webkit-date-and-time-value {
+            margin: 0 auto; /* 文字置中 */
         }
 
+        /* 加料區 */
         .topping-area { background: #F8F9FA; padding: 15px; border-radius: 16px; border: 1px solid #EEE; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
         .topping-tag-btn {
@@ -96,10 +126,11 @@
         .topping-controls { display: flex; gap: 6px; }
         .t-btn {
             border: 1px solid #EEE; background: #FAFAFA; border-radius: 8px;
-            padding: 4px 8px; font-size: 0.8rem; cursor: pointer; color: #555;
-            min-width: 30px; text-align: center;
+            padding: 6px 10px; font-size: 0.8rem; cursor: pointer; color: #555;
+            min-width: 35px; text-align: center;
         }
 
+        /* 按鈕 */
         .input-group { display: flex; gap: 8px; align-items: stretch; }
         .btn-icon {
             width: 50px; flex-shrink: 0; background: var(--primary); color: white; border: none;
@@ -116,16 +147,17 @@
             transition: transform 0.1s;
         }
         .btn-primary:active { transform: scale(0.98); }
-        .btn-cancel { width: 100%; padding: 15px; background: transparent; border: none; color: #999; cursor: pointer; }
+        .btn-cancel { width: 100%; padding: 15px; background: transparent; border: none; color: #999; cursor: pointer; font-size: 16px;}
 
         .checkbox-group { display: flex; gap: 10px; margin-top: 5px; }
         .checkbox-btn {
             flex: 1; padding: 14px; border: 2px solid #E5E7EB; border-radius: 14px;
             font-weight: 700; color: #AAA; cursor: pointer; transition: 0.2s; background: #FFF;
-            display: flex; justify-content: center; align-items: center; gap: 5px;
+            display: flex; justify-content: center; align-items: center; gap: 5px; font-size: 16px;
         }
         .checkbox-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 
+        /* 月曆 */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; padding-top: 10px;}
         .calendar-nav-btn { background: #FFF; border: 1px solid #EEE; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; font-size: 1rem; color: var(--text); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
@@ -138,6 +170,7 @@
         }
         .day:active { transform: translateY(2px); border-bottom-width: 1px; }
         .day.today { border: 2px solid var(--today-border); color: var(--today-border); font-weight: 900; }
+        
         .day.has-record { background-color: var(--primary-light); color: var(--primary-dark); font-weight: 800; border-bottom-color: var(--primary); }
         .day-badge {
             position: absolute; top: -5px; right: -5px;
@@ -146,28 +179,28 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
+
         .day.selected { box-shadow: inset 0 0 0 3px #333; transform: scale(0.95); }
         .day.future { opacity: 0.2; pointer-events: none; background: #eee; border: none; }
 
         .back-today-container { position: absolute; top: -10px; right: 0; width: 100%; text-align: right; }
         .back-today-btn { background: var(--text); color: white; border: none; padding: 4px 10px; border-radius: 10px; font-size: 0.75rem; cursor: pointer; display: inline-block; }
 
-        /* 1. Fix: 圖表樣式修正 (Weekly Chart) */
+        /* 分析圖表 */
         .progress-bar-container { background: #EEE; border-radius: 10px; height: 12px; overflow: hidden; margin-top: 5px; }
         .progress-bar-fill { background: #4CAF50; height: 100%; border-radius: 10px; transition: width 0.5s ease; }
         
         .weekly-chart { 
             display: flex; align-items: flex-end; justify-content: space-between; 
-            height: 120px; /* 加高 */
+            height: 120px; 
             margin-top: 15px; 
-            padding-bottom: 20px; /* 留空間給標籤 */
+            padding-bottom: 20px; 
         }
         .weekly-bar-col { 
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             width: 12%; height: 100%; 
             position: relative;
         }
-        /* 數值標籤 (Bar Top) */
         .weekly-value {
             font-size: 0.7rem; font-weight: bold; color: var(--primary);
             margin-bottom: 2px;
@@ -178,7 +211,7 @@
             border-radius: 6px 6px 0 0; 
             transition: height 0.5s ease; 
             opacity: 0.6;
-            min-height: 4px; /* 確保 0 也有個底線 */
+            min-height: 4px;
         }
         .weekly-bar.max { opacity: 1; background: var(--primary-dark); }
         .weekly-label { 
@@ -191,17 +224,31 @@
         .rank-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: white; margin-right: 12px; flex-shrink: 0; }
         .rank-1 { background: #FFD700; } .rank-2 { background: #C0C0C0; } .rank-3 { background: #CD7F32; }
 
+        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
         
         .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
-        .color-dot { aspect-ratio: 1; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid white; width: 100%; max-width: 50px; margin: 0 auto; position: relative; }
+        .color-dot { 
+            aspect-ratio: 1; border-radius: 50%; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid white; width: 100%; max-width: 50px; margin: 0 auto;
+            position: relative;
+        }
         .color-dot.active::after { content: '✓'; color: white; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         .menu-manager-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .menu-list { background: #F9FAFB; padding: 10px; border-radius: 12px; max-height: 300px; overflow-y: auto; border: 1px solid #EEE; }
 
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); height: 85px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 200; border-top: 1px solid rgba(0,0,0,0.05); }
+        /* 底部導航 (iOS Safe Area) */
+        nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); 
+            height: calc(85px + var(--safe-bottom)); 
+            padding-bottom: var(--safe-bottom);
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 200; 
+            border-top: 1px solid rgba(0,0,0,0.05); 
+        }
         .nav-item { text-align: center; color: #ccc; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
         .nav-item.active { color: var(--primary); font-weight: 700; }
         .fab-container { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; }
@@ -277,7 +324,9 @@
         <form id="drinkForm">
             <div class="form-group" style="text-align:center;">
                 <label>日期</label>
-                <input type="date" id="recordDate" required onchange="checkDateValidity()">
+                <div style="position:relative; width:100%; max-width:250px; margin:0 auto;">
+                    <input type="date" id="recordDate" required onchange="checkDateValidity()">
+                </div>
             </div>
 
             <div class="form-group">
@@ -428,7 +477,7 @@
             </li>
         </ul>
     </div>
-    <div style="text-align:center; color:#CCC; font-size:0.8rem; margin-top:20px;">月底破產兇手名單 v17.0</div>
+    <div style="text-align:center; color:#CCC; font-size:0.8rem; margin-top:20px;">月底破產兇手名單 V18.0</div>
 </div>
 
 <div id="themeModal" class="modal-overlay" onclick="if(event.target === this) closeThemeModal()">
@@ -513,16 +562,17 @@
 </nav>
 
 <script>
-    let records = JSON.parse(localStorage.getItem('drinkRecords_v16')) || [];
-    let presets = JSON.parse(localStorage.getItem('drinkPresets_v16')) || {
+    let records = JSON.parse(localStorage.getItem('drinkRecords_v18')) || [];
+    let presets = JSON.parse(localStorage.getItem('drinkPresets_v18')) || {
         menus: {}, toppings: [], defaultSugar: '半糖', defaultIce: '少冰'
     };
     
-    if (localStorage.getItem('drinkPresets_v15')) {
+    // Migration V16->V18 (Skip V17 internals)
+    if (localStorage.getItem('drinkPresets_v16')) {
         try {
-            const old = JSON.parse(localStorage.getItem('drinkPresets_v15'));
+            const old = JSON.parse(localStorage.getItem('drinkPresets_v16'));
             if(!presets.menus || Object.keys(presets.menus).length === 0) presets = old;
-            localStorage.setItem('drinkPresets_v16', JSON.stringify(presets));
+            localStorage.setItem('drinkPresets_v18', JSON.stringify(presets));
         } catch(e) {}
     }
 
@@ -536,7 +586,6 @@
         isDirty: false
     };
 
-    // 2. Fix: 完整12句語錄
     const slogans = [
         "多喝水沒事，沒事多喝水，錢包更快樂！", 
         "今天沒喝飲料，離財富自由又近了一步～", 
@@ -591,36 +640,35 @@
         window.scrollTo(0,0);
     }
 
-    // --- 1. Fix: Weekly Chart Logic (Distribution by Day of Week) ---
+    // --- Fix: Weekly Chart Logic (Exact Date Matching) ---
     function renderWeeklyChart(data) {
-        // Initialize counts for Sunday(0) to Saturday(6)
-        const dayOfWeekCounts = [0, 0, 0, 0, 0, 0, 0];
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0(Sun)
         
-        // Iterate through all filtered data (e.g., this month's data)
-        data.forEach(r => {
-            // Fix timezone issue by using y/m/d parts
-            const parts = r.date.split('-');
-            const year = parseInt(parts[0]);
-            const month = parseInt(parts[1]) - 1; // JS month is 0-indexed
-            const day = parseInt(parts[2]);
-            const dateObj = new Date(year, month, day);
-            
-            dayOfWeekCounts[dateObj.getDay()]++;
+        // Find "This Week's" 7 specific dates strings (YYYY-MM-DD)
+        const weekDates = [];
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - dayOfWeek);
+        
+        for(let i=0; i<7; i++) {
+            const d = new Date(startOfWeek);
+            d.setDate(startOfWeek.getDate() + i);
+            weekDates.push(formatDate(d));
+        }
+
+        // Count for these specific dates
+        const weekCounts = [0,0,0,0,0,0,0];
+        weekDates.forEach((dateStr, idx) => {
+            const count = records.filter(r => r.date === dateStr).length;
+            weekCounts[idx] = count;
         });
 
-        const maxVal = Math.max(...dayOfWeekCounts);
+        const maxVal = Math.max(...weekCounts);
         const daysLabel = ['日','一','二','三','四','五','六'];
         
-        document.getElementById('weeklyChart').innerHTML = dayOfWeekCounts.map((count, i) => {
-            // Calculate height percentage, max 80% to leave room for label
-            // Ensure min 5px if count > 0 for visibility
+        document.getElementById('weeklyChart').innerHTML = weekCounts.map((count, i) => {
             let heightPct = 0;
-            if (maxVal > 0) {
-                heightPct = (count / maxVal) * 70; 
-            }
-            
-            // Visual logic: if count > 0, min-height is applied via CSS
-            // If count is max, add 'max' class
+            if (maxVal > 0) heightPct = (count / maxVal) * 70; 
             const isMax = (count === maxVal && count > 0);
             
             return `
@@ -762,7 +810,7 @@
                 presets.toppings.push({ name: t.name, price: t.price });
             }
         });
-        localStorage.setItem('drinkPresets_v16', JSON.stringify(presets));
+        localStorage.setItem('drinkPresets_v18', JSON.stringify(presets));
 
         const toppingTotal = appState.currentToppings.reduce((sum, t) => sum + (t.price * t.count), 0);
         let finalCost = priceRaw + toppingTotal;
@@ -855,8 +903,7 @@
         document.getElementById('ecoCountText').innerText = `${ecoCount}/${totalCount} 杯`;
         document.getElementById('ecoProgressBar').style.width = `${ecoRate}%`;
 
-        // Render Weekly Chart
-        renderWeeklyChart(data);
+        renderWeeklyChart(records); // Pass all records, filter inside
 
         const shops={}; const items={}; const combos={}; const tops={};
         data.forEach(r => {
@@ -899,7 +946,7 @@
     function openAddForm() { appState.editingId = null; appState.currentToppings = []; resetFormUI(); const d = appState.selectedDate; const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0'); document.getElementById('recordDate').value = `${yyyy}-${mm}-${dd}`; renderPresetToppingsInForm(); document.getElementById('formTitle').innerText = '新增紀錄'; document.getElementById('formSubmitBtn').innerText = '儲存'; goToPage('form'); }
     function resetFormUI() { document.getElementById('shopName').value = ''; document.getElementById('itemName').value = ''; document.getElementById('price').value = ''; document.getElementById('toppingInput').value = ''; document.getElementById('toppingListDisplay').innerHTML = ''; appState.options = { isEco: false, isTreat: false }; updateCheckboxUI(); document.getElementById('sugar').value = presets.defaultSugar; document.getElementById('ice').value = presets.defaultIce; handleShopChange(); }
     function openEditForm(id) { const record = records.find(r => r.id === id); if(!record) return; appState.editingId = id; document.getElementById('recordDate').value = record.date; document.getElementById('shopName').value = record.shop; handleShopChange(); document.getElementById('itemName').value = record.item; document.getElementById('price').value = record.priceOriginal; document.getElementById('sugar').value = record.sugar; document.getElementById('ice').value = record.ice; appState.currentToppings = record.toppings ? record.toppings.map(t=>({...t})) : []; if(!record.toppings && record.toppingName) appState.currentToppings.push({name:record.toppingName, price:record.toppingPrice||0, count:1, attr:'正常'}); renderToppingList(); renderPresetToppingsInForm(); appState.options.isEco = record.isEco; appState.options.isTreat = record.isTreat; updateCheckboxUI(); document.getElementById('formTitle').innerText = '編輯紀錄'; document.getElementById('formSubmitBtn').innerText = '更新'; goToPage('form'); }
-    function saveRecords() { localStorage.setItem('drinkRecords_v16', JSON.stringify(records)); updateHomeTotal(); }
+    function saveRecords() { localStorage.setItem('drinkRecords_v18', JSON.stringify(records)); updateHomeTotal(); }
     function deleteRecord(id) { if(confirm('刪除？')) { records = records.filter(r => r.id !== id); saveRecords(); viewDayDetails(); renderCalendar(); updateTodayStatus(); }}
     function handleDateClick(y, m, d) { const now = Date.now(); const clickedDate = new Date(y, m, d); if(now - appState.lastClickTime < 300 && isSameDate(clickedDate, appState.selectedDate)) viewDayDetails(); else { appState.selectedDate = clickedDate; renderCalendar(); } appState.lastClickTime = now; }
     function isFutureDate(date) { const today = new Date(); today.setHours(0,0,0,0); const target = new Date(date); target.setHours(0,0,0,0); return target > today; }
@@ -914,9 +961,9 @@
     function updateTodayStatus() { const todayStr = formatDate(new Date()); const total = records.filter(r=>r.date===todayStr).reduce((a,b)=>a+b.finalCost,0); const streak = getStreak(); let html = total===0 ? `<div style="font-size:0.9rem;color:#AAA;">${slogans[Math.floor(Math.random()*slogans.length)]}</div>` : `<div style="font-size:2.5rem;font-weight:800;color:var(--accent);">$${total}</div>`; if(streak>0) html+=`<div class="streak-badge">🔥 已連續喝 ${streak} 天</div>`; document.getElementById('todayStatusContent').innerHTML = html; }
     function getStreak() { const dates = [...new Set(records.map(r=>r.date))].sort((a,b)=>new Date(b)-new Date(a)); if(!dates.length) return 0; const today=new Date(); today.setHours(0,0,0,0); const last=new Date(dates[0]); last.setHours(0,0,0,0); if(Math.round((today-last)/86400000)>1) return 0; let s=0; let prev=new Date(dates[0]); for(let i=0;i<dates.length;i++) { if(i===0){s++}else{ if(Math.round((prev-new Date(dates[i]))/86400000)===1){s++; prev=new Date(dates[i]);}else break;}} return s; }
     function renderRank(c, id, p='', s='') { const arr = Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3); document.getElementById(id).innerHTML = arr.length ? arr.map((x,i)=>`<div class="ranking-item"><div style="display:flex;align-items:center;"><div class="rank-badge rank-${i+1}">${i+1}</div><div>${x[0]}</div></div><div style="font-weight:bold;color:var(--primary)">${p}${x[1]}${s}</div></div>`).join('') : '<div style="color:#ccc;text-align:center;">無資料</div>'; }
-    function exportData() { const backup = { version: "v16", records: records, presets: presets, themeIndex: appState.themeIndex }; const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup)); const a = document.createElement('a'); a.href = str; a.download = `drink_backup_v16_${formatDate(new Date())}.json`; document.body.appendChild(a); a.click(); a.remove(); }
+    function exportData() { const backup = { version: "v18", records: records, presets: presets, themeIndex: appState.themeIndex }; const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup)); const a = document.createElement('a'); a.href = str; a.download = `drink_backup_v18_${formatDate(new Date())}.json`; document.body.appendChild(a); a.click(); a.remove(); }
     function triggerImport() { document.getElementById('importFile').click(); }
-    function handleFileImport(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if(data.version && data.version.startsWith("v")) { if(confirm('還原將覆蓋現有設定，確定嗎？')) { let count = 0; data.records.forEach(r => { if(!records.some(old=>old.id===r.id)) { records.push(r); count++; }}); presets = data.presets; localStorage.setItem('drinkPresets_v16', JSON.stringify(presets)); if(data.themeIndex !== undefined) setTheme(data.themeIndex); alert(`還原成功！新增 ${count} 筆。`); } } else { alert('舊版格式不支援自動合併'); } saveRecords(); location.reload(); } catch(err) { alert('檔案格式錯誤'); } }; reader.readAsText(file); input.value = ''; }
+    function handleFileImport(input) { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); if(data.version && data.version.startsWith("v")) { if(confirm('還原將覆蓋現有設定，確定嗎？')) { let count = 0; data.records.forEach(r => { if(!records.some(old=>old.id===r.id)) { records.push(r); count++; }}); presets = data.presets; localStorage.setItem('drinkPresets_v18', JSON.stringify(presets)); if(data.themeIndex !== undefined) setTheme(data.themeIndex); alert(`還原成功！新增 ${count} 筆。`); } } else { alert('舊版格式不支援自動合併'); } saveRecords(); location.reload(); } catch(err) { alert('檔案格式錯誤'); } }; reader.readAsText(file); input.value = ''; }
     function updateCheckboxUI() { document.getElementById('btnEco').className = `checkbox-btn ${appState.options.isEco ? 'active' : ''}`; document.getElementById('btnTreat').className = `checkbox-btn ${appState.options.isTreat ? 'active' : ''}`; }
     function toggleOption(el, key) { appState.options[key] = !appState.options[key]; updateCheckboxUI(); }
     function formatDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
@@ -934,7 +981,7 @@
     function addCrudItem() { const shop = document.getElementById('crudShopSelect').value; const name = document.getElementById('crudNewItemName').value.trim(); const price = parseInt(document.getElementById('crudNewItemPrice').value) || 0; if(!shop) return alert('請先選擇店家'); if(name) { presets.menus[shop].push({ name, price }); document.getElementById('crudNewItemName').value = ''; document.getElementById('crudNewItemPrice').value = ''; renderCrudItems(); markMenuDirty(); } }
     function updateCrudItem(idx, field, val) { const shop = document.getElementById('crudShopSelect').value; if(field === 'price') val = parseInt(val) || 0; presets.menus[shop][idx][field] = val; markMenuDirty(); }
     function deleteCrudItem(idx) { const shop = document.getElementById('crudShopSelect').value; presets.menus[shop].splice(idx, 1); renderCrudItems(); markMenuDirty(); }
-    function saveMenuChanges() { localStorage.setItem('drinkPresets_v16', JSON.stringify(presets)); appState.isDirty = false; updateMenuSaveButton(); updateShopDatalist(); alert('菜單已儲存！'); closeMenuManagerModal(); }
+    function saveMenuChanges() { localStorage.setItem('drinkPresets_v18', JSON.stringify(presets)); appState.isDirty = false; updateMenuSaveButton(); updateShopDatalist(); alert('菜單已儲存！'); closeMenuManagerModal(); }
     function openPresetModal() { document.getElementById('presetModal').style.display='flex'; appState.isDirty=false; updateSaveButton(); renderSettingsToppingList(); document.getElementById('defaultSugar').value=presets.defaultSugar; document.getElementById('defaultIce').value=presets.defaultIce; }
     function closePresetModal() { document.getElementById('presetModal').style.display = 'none'; }
     function markDirty() { appState.isDirty = true; updateSaveButton(); }
@@ -942,7 +989,7 @@
     function addPresetToppingSetting() { const val = document.getElementById('newPresetToppingInput').value; const match = val.match(/^(.+?)\s*(\d+)$/); if(match) { presets.toppings.push({ name: match[1], price: parseInt(match[2]) }); document.getElementById('newPresetToppingInput').value = ''; renderSettingsToppingList(); markDirty(); } else { alert('格式錯誤，例如：珍珠10'); } }
     function removePresetTopping(idx) { if(confirm('刪除此常用加料？')) { presets.toppings.splice(idx, 1); renderSettingsToppingList(); markDirty(); } }
     function renderSettingsToppingList() { document.getElementById('settingToppingList').innerHTML = presets.toppings.map((t, idx) => `<div class="topping-tag-btn" onclick="removePresetTopping(${idx})">${t.name} $${t.price} <span class="del-x">✕</span></div>`).join(''); }
-    function saveDefaults() { presets.defaultSugar = document.getElementById('defaultSugar').value; presets.defaultIce = document.getElementById('defaultIce').value; localStorage.setItem('drinkPresets_v16', JSON.stringify(presets)); appState.isDirty = false; updateSaveButton(); alert('設定已儲存！'); closePresetModal(); }
+    function saveDefaults() { presets.defaultSugar = document.getElementById('defaultSugar').value; presets.defaultIce = document.getElementById('defaultIce').value; localStorage.setItem('drinkPresets_v18', JSON.stringify(presets)); appState.isDirty = false; updateSaveButton(); alert('設定已儲存！'); closePresetModal(); }
     function openThemeModal() { document.getElementById('themeModal').style.display = 'flex'; }
     function closeThemeModal() { document.getElementById('themeModal').style.display = 'none'; }
 </script>
