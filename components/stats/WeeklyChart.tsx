@@ -45,19 +45,20 @@ export function WeeklyChart({ records }: WeeklyChartProps) {
             dataKey="day"
             axisLine={false}
             tickLine={false}
-            // 修正：文字顏色使用變數 (透過 CSS 讀取，或直接給深色模式適用的灰)
-            tick={{ fill: "#9CA3AF", fontSize: 12 }}
+            // 使用 CSS 變數確保深色模式下文字可見
+            tick={{ fill: "var(--theme-text-sub)", fontSize: 12 }}
             dy={10}
           />
           <Tooltip
-            cursor={{ fill: "var(--color-input-bg)" }} // 修正：Hover 背景變數化
+            cursor={{ fill: "var(--theme-input-bg)" }}
             contentStyle={{
-              borderRadius: "8px",
-              border: "none",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-              backgroundColor: "var(--color-card-bg)", // 修正：Tooltip 背景
-              color: "var(--color-text)", // 修正：Tooltip 文字
+              borderRadius: "12px",
+              border: "1px solid var(--theme-border)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              backgroundColor: "var(--theme-card-bg)", // 跟隨主題背景
+              color: "var(--theme-text)", // 跟隨主題文字
             }}
+            itemStyle={{ color: "var(--theme-text)" }}
             formatter={(value: any) => [`${value} 杯`, "總杯數"]}
             labelFormatter={(label) => `星期${label}`}
           />
@@ -65,11 +66,11 @@ export function WeeklyChart({ records }: WeeklyChartProps) {
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                // 修正重點：使用 var(--color-primary)
+                // 這裡改用 globals.css 定義的正確變數名
                 fill={
                   entry.count === maxVal
-                    ? "var(--color-primary)"
-                    : "var(--color-border)"
+                    ? "var(--theme-primary)"
+                    : "var(--theme-border)" // 未選中的變灰色
                 }
               />
             ))}

@@ -112,7 +112,7 @@ export default function StatsPage() {
   return (
     <div className="pb-24 pt-4 px-4 space-y-6">
       <header className="flex justify-between items-center">
-        <h1 className="text-xl font-extrabold text-[#2C3E50]">飲用分析</h1>
+        <h1 className="text-xl font-extrabold text-text">飲用分析</h1>
         <div className="bg-white p-1 rounded-xl border border-gray-200 flex text-xs font-bold">
           <button
             onClick={() => setScope("month")}
@@ -174,14 +174,14 @@ export default function StatsPage() {
 
       {visible.includes(CHART_IDS.WEEKLY) && (
         <div className="ios-card">
-          <h3 className="font-bold text-[#2C3E50]">每週飲用習慣</h3>
+          <h3 className="font-bold text-text">每週飲用習慣</h3>
           <WeeklyChart records={filteredRecords} />
         </div>
       )}
 
       {visible.includes(CHART_IDS.PIE) && (
         <div className="ios-card">
-          <h3 className="font-bold text-[#2C3E50]">店家喜好分佈</h3>
+          <h3 className="font-bold text-text">店家喜好分佈</h3>
           <ShopPieChart records={filteredRecords} />
         </div>
       )}
