@@ -1,31 +1,36 @@
-"use client";
 import "./globals.css";
-import BottomNav from "@/components/layout/BottomNav";
-import { useTheme } from "@/hooks/useTheme";
-import { ToastProvider } from "@/components/ui/ToastProvider"; // 新增
+import type { Metadata, Viewport } from "next";
+import { AppProviders } from "@/components/layout/AppProviders";
+
+// 1. 設定 Metadata (SEO & PWA)
+export const metadata: Metadata = {
+  title: "月底破產兇手名單",
+  description: "紀錄每一筆飲料開銷",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
+};
+
+// 2. 設定 Viewport (手機版縮放控制)
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // 禁止縮放，像原生 App
+};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  useTheme();
-
   return (
     <html lang="zh-TW">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-      </head>
       <body className="antialiased min-h-screen pb-24 bg-bg text-text transition-colors duration-300">
-        {/* 包裹 ToastProvider */}
-        <ToastProvider>
-          <main className="container max-w-lg mx-auto p-4">{children}</main>
-          <BottomNav />
-        </ToastProvider>
+        {/* 3. 使用剛剛抽離的 Client Component 包裹內容 */}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
