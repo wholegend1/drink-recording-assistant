@@ -19,8 +19,6 @@ export function useCloudBackup() {
 
   const executeBackup = async (fullData: any) => {
     setIsLoading(true);
-
-    // 使用新的金鑰產生邏輯
     const newKey = generateComplexKey();
 
     try {
@@ -31,6 +29,7 @@ export function useCloudBackup() {
           code: newKey,
           data: JSON.stringify(fullData),
         }),
+        cache: "no-store",
       });
 
       const result = await res.json();
@@ -41,7 +40,7 @@ export function useCloudBackup() {
       return result;
     } catch (error) {
       console.error(error);
-      return { status: "error", message: "連線錯誤" };
+      return { status: "error", message: "連線錯誤，請檢查網路" };
     } finally {
       setIsLoading(false);
     }
@@ -51,7 +50,13 @@ export function useCloudBackup() {
     setIsLoading(true);
     try {
       if (!key) throw new Error("請輸入金鑰");
-      const res = await fetch(`/api/backup?code=${key}`);
+
+      const timestamp = new Date().getTime();
+      const res = await fetch(`/api/backup?code=${key}&t=${timestamp}`, {
+        method: "GET",
+        cache: "no-store", 
+      });
+
       return await res.json();
     } catch (error: any) {
       return { status: "error", message: error.message || "連線錯誤" };
