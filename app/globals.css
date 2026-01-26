@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+/* 1. 定義預設 (淺色模式 - Light Mode) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 主題色 */
+  --theme-primary: #6B8E78;
+  --theme-primary-light: #E8F3EB;
+  --theme-primary-dark: #4A6354;
+  --theme-accent: #D67D7D;
+
+  /* iOS Light Palette */
+  --theme-bg: #F2F4F6;
+  /* 淺灰底 */
+  --theme-card-bg: #FFFFFF;
+  /* 白卡片 */
+  --theme-text: #1C1C1E;
+  /* 近黑文字 */
+  --theme-text-sub: #8E8E93;
+  /* 次要文字 (System Gray) */
+  --theme-input-bg: #F2F2F7;
+  /* 輸入框 (System Gray 6) */
+  --theme-border: #E5E5EA;
+  /* 邊框 (System Gray 3) */
+  --theme-badge: #FF5252;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 2. 定義深色模式 (iOS Dark Mode Style) */
+.dark {
+  /* iOS Dark Palette */
+  --theme-bg: #000000;
+  /* 純黑底 (OLED Friendly) */
+  --theme-card-bg: #1C1C1E;
+  /* 深灰卡片 (System Gray 6 Dark) */
+  --theme-text: #F2F2F7;
+  /* 幾乎白文字 */
+  --theme-text-sub: #98989D;
+  /* 次要文字 */
+  --theme-input-bg: #2C2C2E;
+  /* 輸入框比卡片稍亮 (System Gray 5 Dark) */
+  --theme-border: #38383A;
+  /* 邊框 */
+
+  /* 深色模式下的主題色微調 */
+  --theme-primary-light: #2C3832;
+  /* 讓淡色背景在深色模式下變暗，避免刺眼 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 3. 綁定 Tailwind */
+@theme {
+  --color-primary: var(--theme-primary);
+  --color-primary-light: var(--theme-primary-light);
+  --color-primary-dark: var(--theme-primary-dark);
+  --color-accent: var(--theme-accent);
+
+  --color-bg: var(--theme-bg);
+  --color-card-bg: var(--theme-card-bg);
+  --color-text: var(--theme-text);
+  --color-text-sub: var(--theme-text-sub);
+  --color-input-bg: var(--theme-input-bg);
+  --color-border: var(--theme-border);
+  --color-badge: var(--theme-badge);
+
+  --radius-2xl: 20px;
+  --shadow-calendar: 0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 1px 3px -1px rgba(0, 0, 0, 0.06);
+  --shadow-ios: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer components {
+
+  /* 輸入框：移除預設邊框，改用背景色區分 */
+  .ios-input {
+    @apply w-full h-[50px] px-4 text-base bg-input-bg rounded-2xl text-text outline-none transition-colors appearance-none border border-transparent;
+  }
+
+  .ios-input:focus {
+    @apply border-primary bg-card-bg;
+  }
+
+  /* 下拉選單 */
+  .ios-select {
+    @apply w-full h-[50px] px-4 text-base bg-input-bg rounded-2xl text-text outline-none transition-colors appearance-none pr-10 bg-no-repeat border border-transparent;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-position: right 15px center;
+    background-size: 18px;
+  }
+
+  .ios-select:focus {
+    @apply border-primary bg-card-bg;
+  }
+
+  /* 卡片：深色模式下邊框更淡 */
+  .ios-card {
+    @apply bg-card-bg rounded-2xl p-5 mb-4 border border-black/5 dark:border-white/10 shadow-ios;
+  }
+
+  .ios-btn-primary {
+    @apply w-full bg-primary text-white font-extrabold py-4 rounded-2xl shadow-lg active:scale-[0.98] transition-transform flex justify-center items-center cursor-pointer;
+    box-shadow: 0 4px 15px -3px var(--theme-primary);
+  }
+}
+
+@layer utilities {
+  .safe-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
