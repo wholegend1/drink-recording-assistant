@@ -15,6 +15,7 @@ import {
   Check,
   Copy,
   Moon,
+  Info,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -24,6 +25,8 @@ import { useCloudBackup } from "@/hooks/useCloudBackup";
 import { useTheme, THEMES } from "@/hooks/useTheme";
 import { useToast } from "@/components/ui/ToastProvider";
 
+const APP_VERSION = "v1.2.0";
+const COPYRIGHT_YEAR = "2026";
 const CHART_OPTIONS = [
   { id: "chart-overview", name: "📊 總覽數據 (花費/杯數)" },
   { id: "chart-pie-shop", name: "🏠 店家飲用佔比" },
@@ -38,23 +41,31 @@ const CHART_OPTIONS = [
 export default function SettingsPage() {
   const { presets, addShop, deleteShop, updateShopItem, updatePresets } =
     usePresets();
-  const { records } = useDrinkRecords();
+  const { records, setAllRecords } = useDrinkRecords();
   const { executeBackup, executeRestore, isLoading } = useCloudBackup();
   const { themeIndex, applyTheme, isDarkMode, toggleDarkMode } = useTheme();
+  const { showToast } = useToast();
 
   const [activeModal, setActiveModal] = useState<
-    "backup" | "theme" | "menu" | "pref" | "charts" | null
+    "backup" | "theme" | "menu" | "pref" | "charts" | "preview" | null
   >(null);
+
+  // 備份還原相關 State
   const [backupKey, setBackupKey] = useState("");
   const [restoreKey, setRestoreKey] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  // 預覽合併相關 State
+  const [previewData, setPreviewData] = useState<any>(null);
+  const [importSource, setImportSource] = useState("");
+
+  // UI 相關 State
   const [selectedShop, setSelectedShop] = useState("");
   const [newItemName, setNewItemName] = useState("");
   const [newItemPrice, setNewItemPrice] = useState("");
   const [prefToppingInput, setPrefToppingInput] = useState("");
   const [visibleCharts, setVisibleCharts] = useState<string[]>([]);
-  const [copied, setCopied] = useState(false); // 複製狀態
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { showToast } = useToast();
 
   useEffect(() => {
     const saved = localStorage.getItem("visibleCharts");
@@ -71,70 +82,231 @@ export default function SettingsPage() {
     }
   };
 
-  const mergeData = (incomingData: any, sourceName: string) => {
-    const recordCount = incomingData.records?.length || 0;
+  // --- 步驟 1: 分析匯入資料，產生預覽報告 ---
+  const analyzeAndPreview = (incomingData: any, sourceName: string) => {
+    try {
+      // 1. 整理紀錄 (本機優先邏輯)
+      const incomingRecords = Array.isArray(incomingData.records)
+        ? incomingData.records
+        : [];
+      const currentRecords = Array.isArray(records) ? records : [];
 
+      let newRecordsCount = 0;
+      let conflictCount = 0;
+
+      // 用來預覽的統計
+      const incomingIds = new Set(incomingRecords.map((r: any) => r.id));
+      const currentIds = new Set(currentRecords.map((r) => r.id));
+
+      incomingRecords.forEach((r: any) => {
+        if (currentIds.has(r.id)) {
+          conflictCount++; // 本機已有，將會略過雲端版
+        } else {
+          newRecordsCount++; // 本機沒有，將會新增
+        }
+      });
+
+      // 2. 整理設定 (找出新店家、新加料)
+      const incomingPresets = incomingData.presets || {};
+      const incomingMenus = incomingPresets.menus || {};
+      const incomingToppings = Array.isArray(incomingPresets.toppings)
+        ? incomingPresets.toppings
+        : [];
+
+      const currentShopNames = new Set(Object.keys(presets.menus));
+      const currentToppingNames = new Set(presets.toppings.map((t) => t.name));
+
+      const newShops: string[] = [];
+      Object.keys(incomingMenus).forEach((shop) => {
+        if (!currentShopNames.has(shop)) newShops.push(shop);
+      });
+
+      const newToppings: string[] = [];
+      incomingToppings.forEach((t: any) => {
+        if (!currentToppingNames.has(t.name)) newToppings.push(t.name);
+      });
+
+      // 設定預覽資料
+      setPreviewData({
+        rawIncoming: incomingData, // 保存原始資料以便確認後合併
+        stats: {
+          totalIncoming: incomingRecords.length,
+          newRecords: newRecordsCount,
+          conflicts: conflictCount,
+          newShops,
+          newToppings,
+          dateRange:
+            incomingRecords.length > 0
+              ? `${incomingRecords[incomingRecords.length - 1].date} ~ ${incomingRecords[0].date}`
+              : "無日期",
+        },
+      });
+      setImportSource(sourceName);
+      setActiveModal("preview"); // 開啟預覽視窗
+    } catch (e) {
+      console.error("分析失敗:", e);
+      showToast("資料格式錯誤，無法分析", "error");
+    }
+  };
+
+  // --- 步驟 2: 使用者確認後，執行真正的合併 (本機優先) ---
+  const confirmMerge = () => {
+    if (!previewData) return;
+
+    try {
+      const { rawIncoming } = previewData;
+      const incomingRecords = Array.isArray(rawIncoming.records)
+        ? rawIncoming.records
+        : [];
+
+      // 1. 合併紀錄 (本機優先：先放雲端，再用本機覆寫)
+      const recordMap = new Map();
+
+      // 先放入雲端資料 (當底)
+      incomingRecords.forEach((r: any) => {
+        if (r && r.id) recordMap.set(r.id, r);
+      });
+
+      // 再放入本機資料 (覆寫雲端) -> 這就是「本機優先」
+      records.forEach((r) => {
+        if (r && r.id) recordMap.set(r.id, r);
+      });
+
+      const mergedRecords = Array.from(recordMap.values()).sort(
+        (a: any, b: any) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+
+      // 2. 合併設定 (聯集)
+      const incomingPresets = rawIncoming.presets || {};
+
+      // 合併加料
+      const mergedToppings = [...presets.toppings];
+      const currentToppingNames = new Set(presets.toppings.map((t) => t.name));
+      const incomingToppings = Array.isArray(incomingPresets.toppings)
+        ? incomingPresets.toppings
+        : [];
+
+      incomingToppings.forEach((t: any) => {
+        if (!currentToppingNames.has(t.name)) {
+          mergedToppings.push(t);
+        }
+      });
+
+      // 合併店家
+      const mergedMenus = {
+        ...presets.menus,
+        ...(incomingPresets.menus || {}),
+      };
+
+      // 3. 執行更新
+      setAllRecords(mergedRecords);
+      updatePresets({
+        menus: mergedMenus,
+        toppings: mergedToppings,
+        defaultSugar:
+          presets.defaultSugar || incomingPresets.defaultSugar || "半糖", // 偏好也以本機為主
+        defaultIce: presets.defaultIce || incomingPresets.defaultIce || "少冰",
+      });
+
+      showToast(
+        `成功匯入！新增 ${previewData.stats.newRecords} 筆資料`,
+        "success",
+      );
+      setActiveModal(null);
+      setPreviewData(null);
+
+      // 稍微延遲重整
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (e) {
+      console.error("合併失敗:", e);
+      showToast("合併過程發生錯誤", "error");
+    }
+  };
+
+  // 合併資料邏輯 (超級防呆版)
+  const mergeData = (incomingData: any, sourceName: string) => {
     if (
       confirm(
-        `確認匯入 ${sourceName}？\n(包含 ${recordCount} 筆紀錄)\n\n✨ 系統將執行智慧合併：\n• 保留您手機裡的新增紀錄\n• 相同紀錄以備份檔為主`,
+        `確認匯入 ${sourceName}？\n這將會合併雲端與本機的資料。\n(若有重複 ID 以雲端為主)`,
       )
     ) {
       try {
-        // 1. 合併紀錄 (Record Merge)
-        const localRecords = JSON.parse(
-          localStorage.getItem("drinkRecords_v20") || "[]",
-        );
-        const incomingRecords = incomingData.records || [];
+        // --- 1. 處理紀錄 (Records) ---
+        // 防呆：確保是陣列，如果不是就給空陣列
+        const incomingRecords = Array.isArray(incomingData.records)
+          ? incomingData.records
+          : [];
+        const currentRecords = Array.isArray(records) ? records : [];
 
-        // 建立 Map: 以 ID 為 Key
         const recordMap = new Map();
+        // 先放舊的
+        currentRecords.forEach((r) => {
+          if (r && r.id) recordMap.set(r.id, r);
+        });
+        // 再放新的 (覆蓋舊的)
+        incomingRecords.forEach((r: any) => {
+          if (r && r.id) recordMap.set(r.id, r);
+        });
 
-        // 先放本機的 (這樣如果備份檔沒這筆，這筆就會被保留 -> 解決新紀錄被蓋掉的問題)
-        localRecords.forEach((r: any) => recordMap.set(r.id, r));
-
-        // 再放匯入的 (如果 ID 相同，匯入的會覆蓋本機 -> 達成還原目的)
-        incomingRecords.forEach((r: any) => recordMap.set(r.id, r));
-
-        const mergedRecords = Array.from(recordMap.values());
-
-        // 2. 合併 Presets (與之前相同邏輯)
-        const localPresets = JSON.parse(
-          localStorage.getItem("drinkPresets_v20") || "{}",
+        const mergedRecords = Array.from(recordMap.values()).sort(
+          (a: any, b: any) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
+
+        // --- 2. 處理設定 (Presets) ---
         const incomingPresets = incomingData.presets || {};
+        // 這裡不需要讀取 presets 變數，直接用 hook 裡的 presets (它保證是物件)
 
-        // ... (Preset 合併邏輯與之前相同，略過重複代碼以節省篇幅，請保留您原本的 Preset 合併邏輯) ...
-        // 簡單版 Preset 合併 (直接覆蓋，因為設定通常希望以備份為主，或者您可以照抄上次的 deep merge)
-        const finalPresets = { ...localPresets, ...incomingPresets };
-        if (incomingPresets.menus)
-          finalPresets.menus = {
-            ...localPresets.menus,
-            ...incomingPresets.menus,
-          };
-        if (incomingPresets.toppings)
-          finalPresets.toppings = [
-            ...localPresets.toppings,
-            ...incomingPresets.toppings,
-          ]; // 這裡建議去重
+        // ★★★ 關鍵修正：加料防呆 (Toppings) ★★★
+        // 檢查 匯入的 是否為陣列
+        const incomingToppings = Array.isArray(incomingPresets.toppings)
+          ? incomingPresets.toppings
+          : [];
+        // 檢查 本機的 是否為陣列 (這就是原本報錯的地方)
+        const currentToppings = Array.isArray(presets.toppings)
+          ? presets.toppings
+          : [];
 
-        // 3. 寫入
-        localStorage.setItem("drinkRecords_v20", JSON.stringify(mergedRecords));
-        localStorage.setItem("drinkPresets_v20", JSON.stringify(finalPresets));
-        if (incomingData.themeIndex !== undefined)
-          localStorage.setItem(
-            "themeIndex",
-            incomingData.themeIndex.toString(),
-          );
+        // 使用 Map 去除重複名稱 (你提供的 JSON 有重複的椰果/珍珠，這裡會自動修復)
+        const toppingMap = new Map();
+        currentToppings.forEach((t) => {
+          if (t && t.name) toppingMap.set(t.name, t);
+        });
+        incomingToppings.forEach((t: any) => {
+          if (t && t.name) toppingMap.set(t.name, t);
+        });
+        const mergedToppings = Array.from(toppingMap.values());
 
-        showToast("合併成功！頁面將重新整理。", "success");
-        window.location.reload();
+        // 合併菜單 (Menus)
+        const incomingMenus = incomingPresets.menus || {};
+        const currentMenus = presets.menus || {};
+        const mergedMenus = { ...currentMenus, ...incomingMenus };
+
+        // --- 3. 執行更新 ---
+        setAllRecords(mergedRecords);
+        updatePresets({
+          menus: mergedMenus,
+          toppings: mergedToppings,
+          defaultSugar:
+            incomingPresets.defaultSugar || presets.defaultSugar || "半糖",
+          defaultIce:
+            incomingPresets.defaultIce || presets.defaultIce || "少冰",
+        });
+
+        showToast(`成功從 ${sourceName} 還原！`, "success");
+
+        // 延遲重整，確保資料寫入 LocalStorage
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } catch (e) {
-        console.error(e);
-        showToast("資料解析失敗", "error");
+        console.error("合併失敗:", e); // 印出詳細錯誤以便除錯
+        showToast("資料解析失敗：格式不符", "error");
       }
     }
   };
-  
+
   const toggleChart = (id: string) => {
     const newCharts = visibleCharts.includes(id)
       ? visibleCharts.filter((c) => c !== id)
@@ -152,9 +324,9 @@ export default function SettingsPage() {
     });
     if (result.status === "success") {
       setBackupKey(result.key);
-      showToast("備份成功！請保存金鑰", "success"); // 新增成功提示
+      showToast("備份成功！請保存金鑰", "success");
     } else {
-      showToast("備份失敗: " + result.message, "error"); // 替換
+      showToast("備份失敗: " + result.message, "error");
     }
   };
 
@@ -177,18 +349,17 @@ export default function SettingsPage() {
     reader.onload = (ev) => {
       try {
         const rawData = JSON.parse(ev.target?.result as string);
-        // 相容性檢查
         if (
           rawData.version === "v20" ||
           rawData.version === "v18" ||
           (rawData.records && rawData.presets)
         ) {
-          mergeData(rawData, "本機備份檔");
+          analyzeAndPreview(rawData, "本機備份檔");
         } else {
           showToast("檔案格式不支援", "error");
         }
       } catch (err) {
-       showToast("檔案損毀或非 JSON 格式", "error");
+        showToast("檔案損毀或非 JSON 格式", "error");
       }
     };
     reader.readAsText(file);
@@ -200,7 +371,7 @@ export default function SettingsPage() {
     const res = await executeRestore(restoreKey);
     if (res.status === "success") {
       const cloudData = JSON.parse(res.data);
-      mergeData(cloudData, "雲端備份");
+      analyzeAndPreview(cloudData, "雲端備份");
     } else {
       showToast(res.message, "error");
     }
@@ -280,8 +451,95 @@ export default function SettingsPage() {
           />
         </ul>
       </Card>
-
+      {/* Footer: 版本與版權宣告 */}
+      <div className="text-center space-y-2 py-4 opacity-50">
+        <div className="flex justify-center items-center gap-2 text-sm text-text-sub font-bold">
+          <Coffee size={16} />
+          <span>月底破產兇手名單</span>
+        </div>
+        <p className="text-xs text-text-sub">
+          Version {APP_VERSION} <br />© {COPYRIGHT_YEAR} All Rights Reserved.
+        </p>
+      </div>
       {/* Modal: 圖表設定 */}
+      <Modal
+        isOpen={activeModal === "preview"}
+        onClose={() => {
+          setActiveModal(null);
+          setPreviewData(null);
+        }}
+        title="📋 匯入預覽"
+      >
+        {previewData && (
+          <div className="space-y-4">
+            <div className="bg-primary/10 p-3 rounded-xl border border-primary/20">
+              <h4 className="font-bold text-primary flex items-center gap-2 mb-1">
+                <Info size={16} /> 即將從 {importSource} 合併
+              </h4>
+              <p className="text-xs text-text-sub">
+                系統將以「本機資料」為主，僅會補上您手機裡沒有的紀錄。
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {previewData.stats.newRecords}
+                </div>
+                <div className="text-xs text-gray-500">新增紀錄 (筆)</div>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-center opacity-60">
+                <div className="text-2xl font-bold text-gray-500">
+                  {previewData.stats.conflicts}
+                </div>
+                <div className="text-xs text-gray-500">重複/略過 (筆)</div>
+              </div>
+            </div>
+
+            {/* 新增細項清單 */}
+            <div className="space-y-2">
+              {previewData.stats.newShops.length > 0 && (
+                <div className="text-sm">
+                  <span className="font-bold text-text">🏠 新增店家：</span>
+                  <span className="text-text-sub">
+                    {previewData.stats.newShops.join(", ")}
+                  </span>
+                </div>
+              )}
+              {previewData.stats.newToppings.length > 0 && (
+                <div className="text-sm">
+                  <span className="font-bold text-text">✨ 新增加料：</span>
+                  <span className="text-text-sub">
+                    {previewData.stats.newToppings.join(", ")}
+                  </span>
+                </div>
+              )}
+              {previewData.stats.newRecords === 0 &&
+                previewData.stats.newShops.length === 0 &&
+                previewData.stats.newToppings.length === 0 && (
+                  <div className="flex items-center gap-2 text-sm text-gray-500 justify-center py-2">
+                    <Check size={16} /> 資料已同步，無需更新
+                  </div>
+                )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setActiveModal(null)}
+                className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold"
+              >
+                取消
+              </button>
+              <button
+                onClick={confirmMerge}
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30"
+              >
+                確認匯入
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
       <Modal
         isOpen={activeModal === "charts"}
         onClose={() => setActiveModal(null)}
@@ -578,8 +836,10 @@ export default function SettingsPage() {
         title="☁️ Google 雲端備份"
       >
         <div className="space-y-6">
-          <div className="bg-gray-50 p-4 rounded-xl">
-            <h4 className="font-bold text-gray-600 mb-2">📤 上傳備份</h4>
+          <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-xl">
+            <h4 className="font-bold text-gray-600 dark:text-gray-300 mb-2">
+              📤 上傳備份
+            </h4>
             <button
               onClick={handleCloudBackup}
               disabled={isLoading}
@@ -588,7 +848,7 @@ export default function SettingsPage() {
               {isLoading ? "處理中..." : "產生金鑰並備份"}
             </button>
             {backupKey && (
-              <div className="bg-white border border-gray-200 p-3 rounded-lg flex items-center justify-between gap-2">
+              <div className="bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 p-3 rounded-lg flex items-center justify-between gap-2">
                 <div className="overflow-hidden">
                   <p className="text-xs text-gray-400 mb-1">備份金鑰</p>
                   <p className="font-mono font-bold text-lg text-primary truncate">
@@ -597,7 +857,7 @@ export default function SettingsPage() {
                 </div>
                 <button
                   onClick={copyToClipboard}
-                  className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 shrink-0 transition-colors"
+                  className="p-2 bg-gray-100 dark:bg-white/10 rounded-lg hover:bg-gray-200 shrink-0 transition-colors"
                 >
                   {copied ? (
                     <Check size={20} className="text-green-500" />
@@ -608,8 +868,10 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
-          <div className="border-t border-gray-100 pt-4">
-            <h4 className="font-bold text-gray-600 mb-2">📥 從雲端還原</h4>
+          <div className="border-t border-gray-100 dark:border-white/10 pt-4">
+            <h4 className="font-bold text-gray-600 dark:text-gray-300 mb-2">
+              📥 從雲端還原
+            </h4>
             <input
               type="text"
               className="ios-input text-center font-mono mb-3"
@@ -620,9 +882,9 @@ export default function SettingsPage() {
             <button
               onClick={handleCloudRestore}
               disabled={isLoading || !restoreKey}
-              className="w-full bg-gray-200 text-gray-600 font-bold py-3 rounded-2xl"
+              className="w-full bg-gray-200 dark:bg-white/10 text-gray-600 dark:text-gray-300 font-bold py-3 rounded-2xl"
             >
-              {isLoading ? "處理中..." : "下載並合併"}
+              {isLoading ? "處理中..." : "分析並匯入"}
             </button>
           </div>
         </div>
