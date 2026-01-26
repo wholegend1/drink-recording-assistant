@@ -8,14 +8,15 @@ import { RecordList } from "@/components/records/RecordList";
 import { Modal } from "@/components/ui/Modal";
 import { AddDrinkForm } from "@/components/records/AddDrinkForm";
 import { DrinkRecord } from "@/types";
-
-interface PageProps {
-  params: Promise<{ date: string }>;
+interface DayDetailPageProps {
+  params: {
+    date: string;
+  };
 }
 
-export default function DayDetailPage({ params }: PageProps) {
+export default function DayDetailPage({ params }: DayDetailPageProps) {
   const router = useRouter();
-  const { date } = use(params);
+  const date = params.date;
 
   const { records, deleteRecord, updateRecord, addRecord } = useDrinkRecords();
   const [editingRecord, setEditingRecord] = useState<DrinkRecord | null>(null);
@@ -43,7 +44,7 @@ export default function DayDetailPage({ params }: PageProps) {
           <ChevronLeft size={20} className="text-gray-600" />
         </button>
         <div>
-          <h1 className="text-xl font-extrabold text-[#2C3E50]">{date}</h1>
+          <h1 className="text-xl font-extrabold text-text">{date}</h1>
           {/* 新增：本日花費顯示 */}
           <p className="text-sm font-bold text-gray-400 mt-0.5">
             本日花費金額{" "}

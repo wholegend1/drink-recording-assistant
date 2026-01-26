@@ -30,7 +30,7 @@ export function RecordList({ records, onDelete, onEdit }: RecordListProps) {
           <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary" />
 
           <div className="pl-3">
-            <div className="font-bold text-[#2C3E50] flex items-center gap-2">
+            <div className="font-bold text-text flex items-center gap-2">
               {record.shop} - {record.item}
               {record.isTreat && (
                 <span className="bg-red-50 text-red-500 text-[10px] px-1.5 py-0.5 rounded">
@@ -55,7 +55,7 @@ export function RecordList({ records, onDelete, onEdit }: RecordListProps) {
           </div>
 
           <div className="flex flex-col items-end gap-2">
-            <span className="text-xl font-extrabold text-[#2C3E50]">
+            <span className="text-xl font-extrabold text-text">
               ${record.finalCost}
             </span>
             <button

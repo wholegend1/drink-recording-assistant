@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* 1. 定義預設 (淺色模式 - Light Mode) */
 :root {
@@ -16,11 +18,11 @@
   --theme-text: #1C1C1E;
   /* 近黑文字 */
   --theme-text-sub: #8E8E93;
-  /* 次要文字 (System Gray) */
+  /* 次要文字 */
   --theme-input-bg: #F2F2F7;
-  /* 輸入框 (System Gray 6) */
+  /* 輸入框 */
   --theme-border: #E5E5EA;
-  /* 邊框 (System Gray 3) */
+  /* 邊框 */
   --theme-badge: #FF5252;
 }
 
@@ -28,46 +30,25 @@
 .dark {
   /* iOS Dark Palette */
   --theme-bg: #000000;
-  /* 純黑底 (OLED Friendly) */
+  /* 純黑底 */
   --theme-card-bg: #1C1C1E;
-  /* 深灰卡片 (System Gray 6 Dark) */
+  /* 深灰卡片 */
   --theme-text: #F2F2F7;
   /* 幾乎白文字 */
   --theme-text-sub: #98989D;
   /* 次要文字 */
   --theme-input-bg: #2C2C2E;
-  /* 輸入框比卡片稍亮 (System Gray 5 Dark) */
+  /* 輸入框 */
   --theme-border: #38383A;
   /* 邊框 */
 
-  /* 深色模式下的主題色微調 */
   --theme-primary-light: #2C3832;
-  /* 讓淡色背景在深色模式下變暗，避免刺眼 */
-}
-
-/* 3. 綁定 Tailwind */
-@theme {
-  --color-primary: var(--theme-primary);
-  --color-primary-light: var(--theme-primary-light);
-  --color-primary-dark: var(--theme-primary-dark);
-  --color-accent: var(--theme-accent);
-
-  --color-bg: var(--theme-bg);
-  --color-card-bg: var(--theme-card-bg);
-  --color-text: var(--theme-text);
-  --color-text-sub: var(--theme-text-sub);
-  --color-input-bg: var(--theme-input-bg);
-  --color-border: var(--theme-border);
-  --color-badge: var(--theme-badge);
-
-  --radius-2xl: 20px;
-  --shadow-calendar: 0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 1px 3px -1px rgba(0, 0, 0, 0.06);
-  --shadow-ios: 0 4px 20px rgba(0, 0, 0, 0.05);
+  /* 讓淡色背景在深色模式下變暗 */
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
@@ -76,7 +57,7 @@ body {
 
 @layer components {
 
-  /* 輸入框：移除預設邊框，改用背景色區分 */
+  /* 輸入框 */
   .ios-input {
     @apply w-full h-[50px] px-4 text-base bg-input-bg rounded-2xl text-text outline-none transition-colors appearance-none border border-transparent;
   }
@@ -97,9 +78,9 @@ body {
     @apply border-primary bg-card-bg;
   }
 
-  /* 卡片：深色模式下邊框更淡 */
+  /* 卡片 */
   .ios-card {
-    @apply bg-card-bg rounded-2xl p-5 mb-4 border border-black/5 dark:border-white/10 shadow-ios;
+    @apply bg-card-bg rounded-2xl p-5 mb-4 border border-border shadow-ios transition-colors duration-300;
   }
 
   .ios-btn-primary {

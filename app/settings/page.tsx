@@ -25,7 +25,7 @@ import { useCloudBackup } from "@/hooks/useCloudBackup";
 import { useTheme, THEMES } from "@/hooks/useTheme";
 import { useToast } from "@/components/ui/ToastProvider";
 
-const APP_VERSION = "v1.2.0";
+const APP_VERSION = "v1.3.0";
 const COPYRIGHT_YEAR = "2026";
 const CHART_OPTIONS = [
   { id: "chart-overview", name: "📊 總覽數據 (花費/杯數)" },
@@ -380,7 +380,7 @@ export default function SettingsPage() {
   return (
     <div className="pb-24 pt-4 px-4">
       <header className="flex items-center gap-3 mb-6">
-        <h1 className="text-xl font-extrabold text-[#2C3E50]">設定</h1>
+        <h1 className="text-xl font-extrabold text-text">設定</h1>
       </header>
 
       <Card className="!p-0 overflow-hidden">
@@ -482,7 +482,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl text-center">
+              <div className="bg-gray-50 dark:bg-white/5 dark:bg-white/5 p-3 rounded-xl text-center">
                 <div className="text-2xl font-bold text-primary">
                   {previewData.stats.newRecords}
                 </div>
@@ -561,7 +561,7 @@ export default function SettingsPage() {
           {CHART_OPTIONS.map((opt) => (
             <label
               key={opt.id}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-xl cursor-pointer"
+              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-xl cursor-pointer"
             >
               <span className="font-bold text-gray-700">{opt.name}</span>
               <input
@@ -619,7 +619,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 p-3 rounded-xl">
+          <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
             <label className="text-xs font-bold text-gray-400 mb-2 block">
               常用加料 (點 X 刪除)
             </label>
@@ -730,7 +730,7 @@ export default function SettingsPage() {
               <label className="text-xs font-bold text-gray-400 block">
                 編輯品項與價格
               </label>
-              <div className="bg-gray-50 p-3 rounded-xl space-y-2 max-h-[300px] overflow-y-auto border border-gray-100">
+              <div className="bg-gray-50 dark:bg-white/5 p-3 rounded-xl space-y-2 max-h-[300px] overflow-y-auto border border-gray-100">
                 {presets.menus[selectedShop]?.map((item, idx) => (
                   <div
                     key={idx}
